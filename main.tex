@@ -1,0 +1,90 @@
+\documentclass{article}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=10mm,
+ right=10mm,
+ top=10mm,
+ bottom=20mm
+ }
+
+\usepackage{graphicx} % Required for inserting images
+\usepackage[danish,german]{babel}
+\usepackage{xcolor}
+\usepackage{csquotes}
+\usepackage{longtable}
+\usepackage{stackengine}
+
+\usepackage{parcolumns}
+\usepackage{url}
+ 
+\title{Datamaskinerne og Samfundet}
+\author{Peter Naur (aus dem dänischen von André Greubel)}
+\date{Übersetzungsstand: 30.07.2024}
+
+\newcommand{\evl}[1]{\textcolor{orange}{#1}}
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{ToDo:} #1}}
+\newcommand{\anm}[1]{\textcolor{blue}{(Anm. des Übersetzers: #1)}}
+\newcommand{\sic}{\textcolor{blue}{(sic!)}}
+
+
+
+\setstackgap{L}{1ex}  % Adjusts the gap between stacked lines
+
+\newcommand{\alt}[2]{
+\raisebox{-1ex}{
+\stackon{
+    \scriptsize \textcolor{orange}{#2} %normal
+}{
+    \scriptsize \textcolor{blue}{#1} %oben
+}}}
+
+
+\newcommand{\transSec}[2]{
+    \begin{parcolumns}[rulebetween,colwidths={1=0.435\linewidth}]{2}
+        \colchunk[1]{ \section*{#1}  }
+        \colchunk[2]{ \section{#2} }
+    \end{parcolumns}
+}
+
+\newcommand{\transSubSec}[2]{
+    \begin{parcolumns}[rulebetween,colwidths={1=0.435\linewidth}]{2}
+        \colchunk[1]{ \subsection*{#1}  }
+        \colchunk[2]{ \subsection{#2} }
+    \end{parcolumns}
+}
+
+\newcommand{\transTable}[2]{
+\begin{longtable}{p{.45\textwidth} | p{.55\textwidth} }
+#1 & #2
+\end{longtable}
+}
+
+
+\newcommand{\trans}[2]{
+\begin{parcolumns}[rulebetween,colwidths={1=0.435\linewidth}]{2}
+    \colchunk[1]{#1}
+    \colchunk[2]{#2}
+\end{parcolumns}
+}
+
+
+\begin{document}
+
+\maketitle
+
+\input{content/glossar}
+
+\pagebreak
+
+\input{content/kap1}
+\input{content/kap2}
+\input{content/kap3}
+\input{content/kap4}
+\input{content/kap5}
+\input{content/kap6}
+
+\input{content/footnotes}
+
+\end{document}
