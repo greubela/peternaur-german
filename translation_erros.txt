@@ -1,0 +1,12 @@
+Translation issues identified during review:
+
+1. "Im der gleichen Periode" should read "In derselben Periode" (grammatical error in preposition and article). 【F:content/kap1.tex†L147-L148】
+2. "Diese Entwicklung brauchte auch hierzulande Vorteile" should be "brachte uns hierzulande großen Nutzen" (verb mix-up changes the meaning). 【F:content/kap1.tex†L147-L149】
+3. "Bauingenier" is misspelled; correct form is "Bauingenieur". 【F:content/kap1.tex†L147-L150】
+4. "Apperaturen"/"Appertaruren" must be "Apparaturen" (repeated typo). 【F:content/kap1.tex†L120-L121】
+5. "Regnecentralen, die seit 1964 eine Aktiengesellschaft waren" should be singular ("ist seit 1964 eine Aktiengesellschaft"). 【F:content/kap1.tex†L157-L158】
+6. "Apperaten" in the same sentence should be "Apparaten". 【F:content/kap1.tex†L157-L158】
+7. "Auf diesen Punkt stehen wir schwach dar" needs rephrasing to "Bei diesem Punkt stehen wir schwach da" for idiomatic German. 【F:content/kap1.tex†L161-L162】
+8. "wegen den des Traditionalismus" contains duplicated articles; should be "wegen des Traditionalismus". 【F:content/kap1.tex†L161-L162】
+9. "im Stand" ought to be "imstande". 【F:content/kap1.tex†L161-L162】
+10. "dass das größten datenautomatischen Anlagen" should be "dass die größte datenautomatische Anlage" (article and adjective agreement). 【F:content/kap1.tex†L161-L162】
