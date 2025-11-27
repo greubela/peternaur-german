@@ -1,7 +1,6 @@
 const contentEl = document.getElementById('content');
-const dualHeader = document.getElementById('dual-header');
-const singleHeader = document.getElementById('single-header');
-const languageButtons = document.querySelectorAll('.language-button');
+const glossaryEl = document.getElementById('glossary-content');
+const modeRadios = document.querySelectorAll('input[name="mode"]');
 
 const state = {
   mode: 'both',
@@ -10,31 +9,15 @@ const state = {
 function updateMode(newMode) {
   state.mode = newMode;
   contentEl.dataset.mode = newMode;
-  const showBoth = newMode === 'both';
-  dualHeader.hidden = !showBoth;
-  singleHeader.hidden = showBoth;
 
-  languageButtons.forEach((button) => {
-    const lang = button.dataset.lang;
-    const isVisible = showBoth || lang === newMode;
-    button.classList.toggle('is-muted', !showBoth && !isVisible);
-    button.setAttribute('aria-pressed', showBoth ? 'false' : String(isVisible));
+  modeRadios.forEach((radio) => {
+    radio.checked = radio.value === newMode;
   });
 }
 
-function handleLanguageClick(lang) {
-  if (state.mode === 'both') {
-    updateMode(lang === 'da' ? 'de' : 'da');
-  } else if (state.mode === lang) {
-    updateMode('both');
-  } else {
-    updateMode('both');
-  }
-}
-
-languageButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    handleLanguageClick(button.dataset.lang);
+modeRadios.forEach((radio) => {
+  radio.addEventListener('change', () => {
+    updateMode(radio.value);
   });
 });
 
@@ -61,8 +44,8 @@ function createColumn(paragraphs, type, lang) {
   return column;
 }
 
-function renderContent(data) {
-  data.forEach((entry) => {
+function renderContent(entries) {
+  entries.forEach((entry) => {
     const pair = document.createElement('article');
     pair.classList.add('paragraph-pair');
     pair.dataset.type = entry.type;
@@ -75,6 +58,10 @@ function renderContent(data) {
   });
 }
 
+function renderGlossary(glossaryHtml) {
+  glossaryEl.innerHTML = glossaryHtml;
+}
+
 async function init() {
   try {
     const response = await fetch('translation-data.json');
@@ -82,7 +69,8 @@ async function init() {
       throw new Error(`Fehler beim Laden der Daten: ${response.status}`);
     }
     const data = await response.json();
-    renderContent(data);
+    renderGlossary(data.glossary);
+    renderContent(data.entries);
     updateMode('both');
   } catch (error) {
     const message = document.createElement('p');
