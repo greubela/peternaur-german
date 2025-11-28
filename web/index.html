@@ -8,36 +8,45 @@
   </head>
   <body>
     <header class="site-header">
-      <div class="container">
-        <h1>Datamaskinerne og Samfundet</h1>
-        <p class="subtitle">Dänisch &ndash; Deutsch Paralleltext</p>
+      <div class="container site-header__inner">
+        <div class="site-title">
+          <h1>Datamaskinerne og Samfundet</h1>
+          <p class="subtitle">Dänisch &ndash; Deutsch Paralleltext</p>
+        </div>
+        <div class="view-toggle" role="group" aria-label="Sprachauswahl">
+          <label class="view-option">
+            <input type="radio" name="mode" value="de" />
+            <span class="flag-label">
+              <img src="assets/flags/germany.svg" alt="Flagge Deutschlands" />
+              <span>Deutsch</span>
+            </span>
+          </label>
+          <label class="view-option">
+            <input type="radio" name="mode" value="da" />
+            <span class="flag-label">
+              <img src="assets/flags/denmark.svg" alt="Flagge Dänemarks" />
+              <span>Dänisch</span>
+            </span>
+          </label>
+          <label class="view-option">
+            <input type="radio" name="mode" value="both" checked />
+            <span class="flag-label flag-label--dual">
+              <img src="assets/flags/germany.svg" alt="Flagge Deutschlands" />
+              <img src="assets/flags/denmark.svg" alt="Flagge Dänemarks" />
+              <span>Beides</span>
+            </span>
+          </label>
+        </div>
       </div>
     </header>
     <main>
-      <section class="container">
-        <div id="dual-header" class="language-header language-header--dual">
-          <div class="language-column lang-da">
-            <button type="button" class="language-button" data-lang="da">
-              <img src="assets/flags/denmark.svg" alt="Flagge Dänemarks">
-              <span>Dänisch</span>
-            </button>
-          </div>
-          <div class="language-column lang-de">
-            <button type="button" class="language-button" data-lang="de">
-              <img src="assets/flags/germany.svg" alt="Flagge Deutschlands">
-              <span>Deutsch</span>
-            </button>
-          </div>
-        </div>
-        <div id="single-header" class="language-header language-header--single" hidden>
-          <button type="button" class="language-button" data-lang="da">
-            <img src="assets/flags/denmark.svg" alt="Flagge Dänemarks">
-            <span>Dänisch</span>
-          </button>
-          <button type="button" class="language-button" data-lang="de">
-            <img src="assets/flags/germany.svg" alt="Flagge Deutschlands">
-            <span>Deutsch</span>
-          </button>
+      <section class="container glossary-section">
+        <h2 class="section-title">Glossar &amp; Hinweise</h2>
+        <div id="glossary-content" class="glossary-content"></div>
+      </section>
+      <section class="container translation-section">
+        <div class="translation-header">
+          <h2 class="section-title">Übersetzung</h2>
         </div>
         <div id="content" class="content" data-mode="both"></div>
       </section>

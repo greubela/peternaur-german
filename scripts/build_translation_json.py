@@ -11,6 +11,7 @@ from typing import Dict, List, Tuple
 ROOT = Path(__file__).resolve().parent.parent
 MAIN_TEX = ROOT / "main.tex"
 OUTPUT_JSON = ROOT / "web" / "translation-data.json"
+GLOSSARY_TEX = ROOT / "content" / "glossar.tex"
 
 TRANS_MACROS = {
     "\\transSec": "section",
@@ -76,6 +77,14 @@ def _parse_macro(text: str, start: int) -> Tuple[Dict[str, object], int]:
                 "german_raw": arg2.strip(),
             }, i
     raise ValueError(f"Unsupported macro at position {start}")
+
+
+def _parse_heading(line: str) -> Tuple[str | None, str | None]:
+    match = re.match(r"\\(sub)?section\*?\{([^}]*)\}", line)
+    if not match:
+        return None, None
+    level = "h3" if match.group(1) else "h2"
+    return level, match.group(2)
 
 
 def _latex_to_html(text: str) -> str:
@@ -167,6 +176,38 @@ def _split_paragraphs(text: str) -> List[str]:
     return cleaned
 
 
+def parse_glossary(path: Path) -> str:
+    text = _strip_comments(path.read_text(encoding="utf-8"))
+    blocks: List[str] = []
+    paragraph_lines: List[str] = []
+
+    def flush_paragraph() -> None:
+        nonlocal paragraph_lines
+        if not paragraph_lines:
+            return
+        paragraph_text = " ".join(paragraph_lines).strip()
+        if paragraph_text:
+            blocks.append(f"<p>{_latex_to_html(paragraph_text)}</p>")
+        paragraph_lines = []
+
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            flush_paragraph()
+            continue
+
+        level, title = _parse_heading(line)
+        if level and title:
+            flush_paragraph()
+            blocks.append(f"<{level}>{_latex_to_html(title)}</{level}>")
+            continue
+
+        paragraph_lines.append(line)
+
+    flush_paragraph()
+    return "\n".join(blocks)
+
+
 def parse_file(path: Path) -> List[Dict[str, object]]:
     entries: List[Dict[str, object]] = []
     text = _strip_comments(path.read_text(encoding="utf-8"))
@@ -187,11 +228,15 @@ def parse_file(path: Path) -> List[Dict[str, object]]:
 
 
 def main() -> None:
-    content_files = _load_content_files()
+    content_files = [path for path in _load_content_files() if path.name != "glossar.tex"]
     data: List[Dict[str, object]] = []
     for file_path in content_files:
         data.extend(parse_file(file_path))
-    json_text = json.dumps(data, ensure_ascii=False, indent=2)
+
+    glossary_html = parse_glossary(GLOSSARY_TEX)
+    payload = {"glossary": glossary_html, "entries": data}
+
+    json_text = json.dumps(payload, ensure_ascii=False, indent=2)
     OUTPUT_JSON.write_text(json_text + "\n", encoding="utf-8")
 
 
