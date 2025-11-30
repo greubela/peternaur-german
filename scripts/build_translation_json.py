@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 MAIN_TEX = ROOT / "main.tex"
 OUTPUT_JSON = ROOT / "web" / "translation-data.json"
 GLOSSARY_TEX = ROOT / "content" / "glossar.tex"
+FOOTNOTES_TEX = ROOT / "content" / "footnotes.tex"
 
 TRANS_MACROS = {
     "\\transSec": "section",
@@ -144,9 +145,12 @@ def _latex_to_html(text: str) -> str:
             end = text.find("$", i + 1)
             if end != -1:
                 content = text[i + 1 : end]
-                match = re.match(r"\^\{([^}]+)\}", content)
+                match = re.match(r"\^\{\(([^}]+)\)\}", content)
                 if match:
-                    result.append(f"<sup>({match.group(1)})</sup>")
+                    footnote_id = match.group(1)
+                    result.append(
+                        f'<sup class="footnote-ref" data-footnote-id="{footnote_id}">{footnote_id}</sup>'
+                    )
                 else:
                     result.append(content)
                 i = end + 1
@@ -208,6 +212,49 @@ def parse_glossary(path: Path) -> str:
     return "\n".join(blocks)
 
 
+def _extract_footnote_id(html: str) -> str | None:
+    match = re.search(r'data-footnote-id="([^"]+)"', html)
+    if match:
+        return match.group(1)
+    return None
+
+
+def parse_footnotes(path: Path) -> List[Dict[str, str]]:
+    raw_text = _strip_comments(path.read_text(encoding="utf-8"))
+
+    pattern = re.compile(r"\$\^\{\(([^)]+)\)\}\s*", re.MULTILINE)
+    matches = list(pattern.finditer(raw_text))
+    ordered_ids: List[str] = []
+    footnote_map: Dict[str, Dict[str, str]] = {}
+
+    for idx, match in enumerate(matches):
+        start = match.end()
+        end = matches[idx + 1].start() if idx + 1 < len(matches) else len(raw_text)
+        note_text = raw_text[start:end].strip()
+        cleaned_text = note_text.strip("{} ")
+        cleaned_text = re.sub(r"^\$\s*", "", cleaned_text)
+        html_text = _latex_to_html(cleaned_text)
+
+        note_id = match.group(1)
+        if note_id not in footnote_map:
+            ordered_ids.append(note_id)
+            footnote_map[note_id] = {"id": note_id, "danish": "", "german": ""}
+
+        entry = footnote_map[note_id]
+        if not entry["danish"]:
+            entry["danish"] = html_text
+        elif not entry["german"]:
+            entry["german"] = html_text
+        else:
+            entry["german"] += f" {html_text}"
+
+    for entry in footnote_map.values():
+        if not entry["german"]:
+            entry["german"] = entry["danish"]
+
+    return [footnote_map[note_id] for note_id in ordered_ids]
+
+
 def parse_file(path: Path) -> List[Dict[str, object]]:
     entries: List[Dict[str, object]] = []
     text = _strip_comments(path.read_text(encoding="utf-8"))
@@ -234,7 +281,8 @@ def main() -> None:
         data.extend(parse_file(file_path))
 
     glossary_html = parse_glossary(GLOSSARY_TEX)
-    payload = {"glossary": glossary_html, "entries": data}
+    footnotes = parse_footnotes(FOOTNOTES_TEX)
+    payload = {"glossary": glossary_html, "entries": data, "footnotes": footnotes}
 
     json_text = json.dumps(payload, ensure_ascii=False, indent=2)
     OUTPUT_JSON.write_text(json_text + "\n", encoding="utf-8")
