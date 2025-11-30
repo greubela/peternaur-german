@@ -53,16 +53,22 @@
         </div>
       </div>
     </nav>
-    <main>
-      <section class="container glossary-section">
-        <div class="section-header">
-          <h2 class="section-title">Glossar &amp; Hinweise</h2>
-          <button id="glossary-toggle" class="toggle-button" aria-expanded="false" aria-controls="glossary-content">
-            Glossar anzeigen
-          </button>
+    <section class="glossary-bar">
+      <div class="container toc-bar__inner">
+        <button
+          id="glossary-toggle"
+          class="toggle-button"
+          aria-expanded="false"
+          aria-controls="glossary-panel"
+        >
+          Glossar &amp; Hinweise
+        </button>
+        <div id="glossary-panel" class="collapse-panel">
+          <div id="glossary-content" class="glossary-content"></div>
         </div>
-        <div id="glossary-content" class="glossary-content collapse-panel"></div>
-      </section>
+      </div>
+    </section>
+    <main>
       <section class="container translation-section">
         <div class="translation-header">
           <h2 class="section-title">Übersetzung</h2>

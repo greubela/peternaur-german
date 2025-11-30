@@ -5,8 +5,14 @@ const tocListEl = document.getElementById('toc-list');
 const tocToggleButton = document.getElementById('toc-toggle');
 const tocPanel = document.getElementById('toc-panel');
 const glossaryToggleButton = document.getElementById('glossary-toggle');
+const glossaryPanel = document.getElementById('glossary-panel');
 const footnotesEl = document.getElementById('footnotes-content');
 const headerEl = document.querySelector('.site-header');
+
+const TOC_LABEL_CLOSED = 'Inhaltsverzeichnis anzeigen';
+const TOC_LABEL_OPEN = 'Inhaltsverzeichnis verbergen';
+const GLOSSARY_LABEL_CLOSED = 'Glossar anzeigen';
+const GLOSSARY_LABEL_OPEN = 'Glossar verbergen';
 
 const state = {
   mode: 'both',
@@ -24,6 +30,12 @@ function toggleCollapsible(button, panel, labelWhenClosed, labelWhenOpen) {
   button.setAttribute('aria-expanded', isOpen.toString());
   button.textContent = isOpen ? labelWhenOpen : labelWhenClosed;
 }
+
+function setCollapsibleState(button, panel, shouldOpen, labelWhenClosed, labelWhenOpen) {
+  panel.classList.toggle('is-open', shouldOpen);
+  button.setAttribute('aria-expanded', shouldOpen.toString());
+  button.textContent = shouldOpen ? labelWhenOpen : labelWhenClosed;
+}
 function syncToggleLabel(button, panel, labelWhenClosed, labelWhenOpen) {
   const isOpen = panel.classList.contains('is-open');
   button.setAttribute('aria-expanded', isOpen.toString());
@@ -37,6 +49,8 @@ function updateMode(newMode) {
   modeRadios.forEach((radio) => {
     radio.checked = radio.value === newMode;
   });
+
+  buildTableOfContents();
 }
 
 modeRadios.forEach((radio) => {
@@ -167,7 +181,18 @@ function buildTableOfContents() {
   );
 
   items.forEach((pair) => {
-    const heading = pair.querySelector('.lang-de h2, .lang-de h3, h2, h3');
+    const heading =
+      pair.querySelector(
+        state.mode === 'da'
+          ? '.lang-da h2, .lang-da h3'
+          : state.mode === 'de'
+            ? '.lang-de h2, .lang-de h3'
+            : '.lang-de h2, .lang-de h3',
+      ) ||
+      pair.querySelector('.lang-de h2, .lang-de h3') ||
+      pair.querySelector('.lang-da h2, .lang-da h3') ||
+      pair.querySelector('h2, h3');
+
     const text = heading ? heading.textContent?.trim() : 'Abschnitt';
     if (!pair.id) return;
 
@@ -198,17 +223,24 @@ async function init() {
     updateMode('both');
     enhanceFootnoteRefs();
     buildTableOfContents();
-    if (glossaryToggleButton && glossaryEl) {
-      syncToggleLabel(glossaryToggleButton, glossaryEl, 'Glossar anzeigen', 'Glossar verbergen');
+    if (glossaryToggleButton && glossaryPanel) {
+      syncToggleLabel(glossaryToggleButton, glossaryPanel, GLOSSARY_LABEL_CLOSED, GLOSSARY_LABEL_OPEN);
       glossaryToggleButton.addEventListener('click', () =>
-        toggleCollapsible(glossaryToggleButton, glossaryEl, 'Glossar anzeigen', 'Glossar verbergen'),
+        toggleCollapsible(glossaryToggleButton, glossaryPanel, GLOSSARY_LABEL_CLOSED, GLOSSARY_LABEL_OPEN),
       );
     }
     if (tocToggleButton && tocPanel) {
-      syncToggleLabel(tocToggleButton, tocPanel, 'Inhaltsverzeichnis anzeigen', 'Inhaltsverzeichnis verbergen');
+      syncToggleLabel(tocToggleButton, tocPanel, TOC_LABEL_CLOSED, TOC_LABEL_OPEN);
       tocToggleButton.addEventListener('click', () =>
-        toggleCollapsible(tocToggleButton, tocPanel, 'Inhaltsverzeichnis anzeigen', 'Inhaltsverzeichnis verbergen'),
+        toggleCollapsible(tocToggleButton, tocPanel, TOC_LABEL_CLOSED, TOC_LABEL_OPEN),
       );
+
+      tocListEl?.addEventListener('click', (event) => {
+        if (!(event.target instanceof HTMLElement)) return;
+        if (event.target.closest('a')) {
+          setCollapsibleState(tocToggleButton, tocPanel, false, TOC_LABEL_CLOSED, TOC_LABEL_OPEN);
+        }
+      });
     }
   } catch (error) {
     const message = document.createElement('p');
